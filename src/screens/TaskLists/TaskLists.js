@@ -1,38 +1,44 @@
 import React, { Component } from 'react';
-import { View, Text, ImageBackground, FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
+import { 
+    View, 
+    Text, 
+    ImageBackground, 
+    FlatList, 
+    TouchableOpacity, 
+    SafeAreaView,
+    Alert,
+} from 'react-native';
 
 import styles from './styles';
 
+import AsyncStorage from '@react-native-community/async-storage'; 
 import Icon from 'react-native-vector-icons/FontAwesome';
-
-import todayImage from '../../../assets/imgs/today.jpg';
 
 import moment from 'moment';
 import 'moment/locale/pt-br';
 
+import todayImage from '../../../assets/imgs/today.jpg';
+
 import Task from '../../components/Task/Task';
 import AddTask from '../AddTask/AddTask';
 
+const initialState = { 
+    showDoneTasks: true,
+    showAddTask: false,
+    visibleTasks: [],
+    tasks: [],
+};
+
 export default class TaskList extends Component {
     state = {
-        showDoneTasks: true,
-        showAddTask: true,
-        visibleTasks: [],
-        tasks: [{
-            id: Math.random(),
-            desc: 'Comprar livro',
-            estimateAt: new Date(),
-            doneAt: null,
-        }, {
-            id: Math.random(),
-            desc: 'Ler livro',
-            estimateAt: new Date(),
-            doneAt: null,
-        }]
+        ...initialState
     };
 
-    componentDidMount = () => {
-        this.filterTasks();
+    componentDidMount = async () => {
+        const stateString = await AsyncStorage.getItem('tasksState');
+        const state = JSON.parse(stateString) || initialState;
+
+        this.setState(state, this.filterTasks);
     }
 
     toggleFilter = () => {
@@ -51,6 +57,8 @@ export default class TaskList extends Component {
         }
 
         this.setState({ visibleTasks });
+
+        AsyncStorage.setItem('tasksState', JSON.stringify(this.state))
     };
 
     toggleTask = taskId => {
@@ -64,6 +72,30 @@ export default class TaskList extends Component {
         this.setState({ tasks }, this.filterTasks);
     };
 
+    addTask = newTask => {
+        if(!newTask.desc || !newTask.desc.trim()){
+            Alert.alert('Dados Invalidos', 'Descricao nao informada');
+
+            return
+        }
+
+        const tasks = [...this.state.tasks];
+        tasks.push({
+            id: Math.random(),
+            desc: newTask.desc,
+            estimateAt: newTask.date,
+            doneAt: null,
+        });
+
+        this.setState({ tasks, showAddTask: false }, this.filterTasks);
+    };
+
+    deleteTask = id => {
+        const tasks = this.state.tasks.filter(task => task.id !== id);
+
+        this.setState({ tasks }, this.filterTasks);
+    };
+
     render() {
         const today = moment()
             .locale('pt-br')
@@ -71,7 +103,11 @@ export default class TaskList extends Component {
 
         return (
             <View style={styles.container}>
-                <AddTask isVisible={this.state.showAddTask} onCancel={() => this.setState({ showAddTask: false })} />
+                <AddTask 
+                    isVisible={this.state.showAddTask} 
+                    onCancel={() => this.setState({ showAddTask: false })} 
+                    onSave={this.addTask}
+                />
                 <ImageBackground 
                     style={styles.background} 
                     source={todayImage}
@@ -92,9 +128,17 @@ export default class TaskList extends Component {
                     <FlatList 
                         data={this.state.visibleTasks} 
                         keyExtractor={item => `${item.id}`}
-                        renderItem={({ item }) => <Task {...item} toggleTask={this.toggleTask} />}
+                        renderItem={({ item }) => <Task {...item} onToggleTask={this.toggleTask} onDelete={this.deleteTask} />}
                     />
                 </View>
+
+                <TouchableOpacity 
+                    style={styles.addButton} 
+                    onPress={() => this.setState({ showAddTask: true })}
+                    activeOpacity={0.7}
+                >
+                    <Icon name="plus" size={20} style={styles.icon}/>
+                </TouchableOpacity>
             </View>
         );
     };

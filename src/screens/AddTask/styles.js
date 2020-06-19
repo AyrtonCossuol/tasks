@@ -40,5 +40,11 @@ export default StyleSheet.create({
         margin: 20,
         marginRight: 30,
         color: commonStyles.colors.today,
+    },
+
+    date: {
+        fontFamily: commonStyles.fontFamily,
+        fontSize: 20,
+        marginLeft: 15,
     }
 });

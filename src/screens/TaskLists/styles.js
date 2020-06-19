@@ -45,5 +45,17 @@ export default StyleSheet.create({
 
     icon: {
         color: commonStyles.colors.secondary,
+    },
+
+    addButton: {
+        position: 'absolute',
+        right: 30,
+        bottom: 30,
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: commonStyles.colors.today,
+        alignItems: 'center',
+        justifyContent: 'center',
     }
 });
