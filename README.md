@@ -7,9 +7,9 @@ O projeto até o momento adiciona a tarefa mas não é redirecionada ao dia marc
 ## Layout
 
 <p align="center">
-  <img alt="tasks" padding-right="10px" title="#tasks" src="./images/home.png" width="200px">
+  <img alt="tasks" style="padding-right: 10px;" title="#tasks" src="./images/home.png" width="200px">
 
-  <img alt="tasks" padding-right="10px" title="#tasks" src="./images/home-hidden.png" width="200px">
+  <img alt="tasks" style="padding-right: 10px;" title="#tasks" src="./images/home-hidden.png" width="200px">
 
   <img alt="tasks" title="#tasks" src="./images/create.png" width="200px">
 </p>
